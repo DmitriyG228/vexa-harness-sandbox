@@ -421,7 +421,14 @@ async def root():
     """Provides a welcome message for the Vexa API Gateway."""
     return {"message": "Welcome to the Vexa API Gateway"}
 
-# --- Bot Manager Routes --- 
+
+@app.get("/version", tags=["General"], summary="Service version")
+async def version():
+    """Returns the service name and current version."""
+    return {"service": "api-gateway", "version": app.version}
+
+
+# --- Bot Manager Routes ---
 @app.post("/bots",
          tags=["Bot Management"],
          summary="Request a new bot to join a meeting",
