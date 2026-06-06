@@ -1,0 +1,32 @@
+name: rung
+# MVP0 projected gate — the rung label is a PRODUCT of CI, never hand-set.
+# Compose validation is stubbed (presence of _mvp0/compose-ok) so the experiment tests the
+# MECHANISM (CI writes the carrier; branch protection gates merge on it), not real vexa compose.
+on:
+  pull_request:
+    branches: [ main ]
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+jobs:
+  rung:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: compose validation (stub)
+        run: |
+          if [ -f _mvp0/compose-ok ]; then
+            echo "compose stub: PASS — pack is compose-validated"
+          else
+            echo "compose stub: FAIL — pack has not passed compose validation"
+            exit 1
+          fi
+      - name: stamp rung:compose (only reachable on green)
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo '{"labels":["rung:compose"]}' \
+            | gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --input -
+          echo "rung:compose stamped by CI on PR #${{ github.event.pull_request.number }}"
