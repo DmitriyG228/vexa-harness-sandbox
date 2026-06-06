@@ -4,6 +4,7 @@ Inspects the FastAPI app object to verify routes exist and map correctly.
 Does NOT send HTTP requests -- just checks the app's route table.
 """
 import pytest
+from fastapi.testclient import TestClient
 from main import app
 
 
@@ -105,3 +106,16 @@ class TestWebSocketRoute:
 class TestRootRoute:
     def test_root_exists(self):
         assert ("GET", "/") in ROUTES
+
+
+class TestVersionRoute:
+    def test_version_route_exists(self):
+        assert ("GET", "/version") in ROUTES
+
+    def test_version_returns_200_and_shape(self):
+        client = TestClient(app)
+        response = client.get("/version")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["service"] == "api-gateway"
+        assert isinstance(body["version"], str)
