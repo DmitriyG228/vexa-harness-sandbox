@@ -1,0 +1,54 @@
+# .harness/target.yaml — the contract any harness reads to drive THIS repo.
+# Minimal: pack discovery, worker delivery criteria, gate templates. The CTO consults this
+# instead of hardcoding vexa-specific knowledge; another repo drops in its own version
+# to become drivable.
+
+target:
+  name: vexa-harness-sandbox
+  repos:
+    - DmitriyG228/vexa-harness-sandbox
+  default_branch: main
+
+pack:
+  # An issue is a pack when it carries this label. status_labels are mutually exclusive.
+  issue_label: pack
+  status_labels:
+    available: status:available
+    in_progress: status:in-progress
+    released: status:released
+  # Convention used by every worker: one branch per pack, one PR.
+  branch_pattern: "pack/{pack_id}"
+  pr_target_branch: main
+
+worker:
+  # What the CTO's worker prompt must require the worker to produce, for delivery to count.
+  delivery_contract: |
+    The pack is delivered when ALL of:
+      1. A branch named pack/{pack_id} exists on the target repo.
+      2. A draft PR from pack/{pack_id} → main is open, referencing the pack issue (#N).
+      3. The pack's stated acceptance criteria (in the issue body) are satisfied on that branch,
+         verifiable by inspection of the diff.
+      4. The CI 'rung' check is green on the head (so the carrier label is machine-written).
+  isolation: each worker runs as a fresh `claude -p` process; no shared filesystem state.
+
+rungs:
+  # For MVP1 the compose check is a SHELL stub: every script in tests3/checks/scripts/
+  # must be syntactically valid (bash -n). Real compose-up comes later.
+  compose_check_recipe: |
+    set -e
+    for s in tests3/checks/scripts/*.sh; do bash -n "$s"; done
+  rung_writer_workflow: .github/workflows/rung.yml   # MVP0 CI writer (already deployed)
+
+gates:
+  # Card templates the CTO surfaces verbatim when it needs a human decision.
+  P2: templates/gate-P2-scope-sign.md
+  P5: templates/gate-P5-code-review.md
+  P8: templates/gate-P8-eyeball-live.md
+  # The harness's templates/ dir on the host filesystem is the authoritative source.
+  template_root: /home/dima/dev/vexa-pipeline-skills/templates
+
+stage_floors:
+  # Consumed by bin/pipeline-status.py and any eligibility check.
+  P5: compose
+  P7: clean-room
+  P8: live
