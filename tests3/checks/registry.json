@@ -1519,6 +1519,16 @@
       "file": "services/vexa-bot/core/src/platforms/msteams/join.ts",
       "must_match": "continueWithoutMediaClickAttempts",
       "max_duration_sec": 5
+    },
+    {
+      "id": "REGISTRY_JSON_VALID",
+      "tier": "static",
+      "found": "2026-06-06",
+      "proves": "tests3/checks/registry.json parses as valid JSON",
+      "symptom": "registry.json is malformed — checks cannot be loaded",
+      "method": "SHELL_CHECK",
+      "script": "tests3/checks/scripts/registry-json-valid.sh",
+      "max_duration_sec": 5
     }
   ]
 }
