@@ -4,8 +4,8 @@ name: rung-guard
 # on a human/PAT label add. Any such hand-set rung: label is reverted: the carrier has one
 # writer, and it is not a hand.
 on:
-  pull_request:
-    types: [labeled]
+  pull_request_target:    # runs from the BASE branch (trusted), not the PR head — a guard
+    types: [labeled]      # must not depend on the head containing the workflow
 permissions:
   issues: write
   pull-requests: write
