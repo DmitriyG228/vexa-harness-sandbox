@@ -1519,6 +1519,16 @@
       "file": "services/vexa-bot/core/src/platforms/msteams/join.ts",
       "must_match": "continueWithoutMediaClickAttempts",
       "max_duration_sec": 5
+    },
+    {
+      "id": "README_HAS_TITLE",
+      "tier": "static",
+      "found": "2026-06-06",
+      "proves": "README.md's first non-blank line starts with '# ' — repo has a top-level markdown heading",
+      "symptom": "README.md missing a top-level markdown heading — first non-blank line does not start with '# '",
+      "method": "SHELL_CHECK",
+      "script": "tests3/checks/scripts/readme-has-title.sh",
+      "max_duration_sec": 5
     }
   ]
 }
